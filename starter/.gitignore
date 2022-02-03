@@ -11,5 +11,6 @@ venv
 .Trashes
 ehthumbs.db
 Thumbs.db
+**/nd-proj2-be
 
 **/node_modules
