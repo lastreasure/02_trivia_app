@@ -22,13 +22,33 @@ def create_app(test_config=None):
     '''
   @TODO: Use the after_request decorator to set Access-Control-Allow
   '''
-
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Headers',
+                             'Content-Type, Authorization')
+        response.headers.add('Access-Control-Allow-Headers',
+                             'GET, POST, PATCH, DELETE, OPTION')
+        return response
     '''
   @TODO: 
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
+    @app.route('/categories', methods=['GET'])
+    def get_categories():
+        # pagination
+        page = request.args.get('page', 1, type=int)
+        start = (page - 1) * QUESTIONS_PER_PAGE
+        end = start + QUESTIONS_PER_PAGE
+        categories = Category.query.all()
+        # print(categories)
+        formatted_categories = [category.format() for category in categories]
 
+        return jsonify({
+            'success': True,
+            'categories': formatted_categories[start:end],
+            'total_categories': formatted_categories
+        })
     '''
   @TODO: 
   Create an endpoint to handle GET requests for questions, 
