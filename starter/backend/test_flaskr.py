@@ -75,6 +75,32 @@ class TriviaTestCase(unittest.TestCase):
     #     self.assertEqual(data["success"], False)
     #     self.assertEqual(data["message"], "unprocessable")
 
+    def test_create_question(self):
+        new_question = {
+            'question': 'Why is a raven like a writing desk?',
+            'answer': '42',
+            'category': 1,
+            'difficulty': '1'
+        }
+        res = self.client().post('/questions', json=new_question)
+        data = json.loads(res.data)
+        print(data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    # def test_422_if_create_question_not_allowed(self):
+    #     new_question = {
+    #         'answer': '42',
+    #         'category': 1,
+    #         'difficulty': '3'
+    #     }
+    #     res = self.client().post('/questions', json=new_question)
+    #     data = json.loads(res.data)
+
+    #     self.assertEqual(res.status_code, 422)
+    #     self.assertEqual(data['success'], False)
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
