@@ -36,14 +36,14 @@ class TriviaTestCase(unittest.TestCase):
     """
 
     def test_get_categories(self):
-        res = self.client().get("/categories")
+        res = self.client().get('/categories')
         data = json.loads(res.data)
         print(data)
 
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(data["success"], True)
-        self.assertTrue(data["categories"])
-        self.assertTrue(data["total_categories"])
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['categories'])
+        self.assertTrue(data['total_categories'])
 
     def test_get_questions(self):
         res = self.client().get('/questions')
@@ -52,20 +52,20 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(data["questions"])
-        self.assertTrue(data["categories"])
+        self.assertTrue(data['questions'])
+        self.assertTrue(data['categories'])
         self.assertTrue(data['total_questions'])
 
     # def test_delete_question(self):
-    #     res = self.client().delete("/questions/6")
+    #     res = self.client().delete('/questions/6')
     #     data = json.loads(res.data)
-    #     print(data)
+    #     # print(data)
 
     #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data["success"], True)
-    #     self.assertEqual(data["deleted"], 6)
-    #     self.assertTrue(data["total_questions"])
-    #     self.assertTrue(len(data["questions"]))
+    #     self.assertEqual(data['success'], True)
+    #     self.assertEqual(data['deleted'], 6)
+        # self.assertTrue(data['total_questions'])
+        # self.assertTrue(len(data['questions']))
 
     # def test_422_if_question_does_not_exist(self):
     #     res = self.client().delete("/questions/2000")
@@ -91,8 +91,9 @@ class TriviaTestCase(unittest.TestCase):
 
     # def test_422_if_create_question_not_allowed(self):
     #     new_question = {
+        # 'question': 'Why is a raven like a writing desk?',
     #         'answer': '42',
-    #         'category': 1,
+    #         'category': '',
     #         'difficulty': '3'
     #     }
     #     res = self.client().post('/questions', json=new_question)
@@ -100,6 +101,23 @@ class TriviaTestCase(unittest.TestCase):
 
     #     self.assertEqual(res.status_code, 422)
     #     self.assertEqual(data['success'], False)
+
+    # def test_get_question_from_category(self):
+    #     res = self.client().get('/categories/2/questions')
+    #     data = json.loads(res.data)
+
+    #     self.assertEqual(res.status_code, 200)
+    #     self.assertEqual(data['success'], True)
+    #     self.assertNotEqual(len(data['questions']), 0)
+    #     self.assertEqual(data['current_category'], 'Art')
+
+    def test_search_question_by_term(self):
+        res = self.client().post('questions/search', json={"searchTerm": "bo"})
+        data = json.loads(res.data)
+
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertTrue(data['total_questions'])
 
 
 # Make the tests conveniently executable

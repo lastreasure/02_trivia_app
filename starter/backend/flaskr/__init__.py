@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
 
+
 from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
@@ -49,12 +50,11 @@ def create_app(test_config=None):
   '''
     @app.route('/categories', methods=['GET'])
     def get_categories():
-        categories = Category.query.all()
+        categories = Category.query.order_by(Category.id).all()
         print(categories)
-        # formatted_categories = [category.format() for category in categories]
         formatted_categories = {
             category.id: category.type for category in categories}
-        print(formatted_categories)
+        # print(formatted_categories)
 
         if len(categories) == 0:
             abort(404)
@@ -85,7 +85,6 @@ def create_app(test_config=None):
 
         categories = Category.query.all()
         # print(categories)
-        # formatted_categories = [category.format() for category in categories]
         formatted_categories = {
             category.id: category.type for category in categories}
 
@@ -103,7 +102,7 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page.
   '''
-    @app.route('/questions/<int:question_id>', methods=['DELETE'])
+    @ app.route('/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
         try:
             question = Question.query.filter(
@@ -175,6 +174,31 @@ def create_app(test_config=None):
   only question that include that string within their question.
   Try using the word "title" to start.
   '''
+    @app.route("/questions/search", methods=["POST"])
+    def search_question():
+
+        body = request.get_json()
+        search = body.get("searchTerm", None)
+        selection = Question.query.order_by(Question.id).filter(
+            Question.question.ilike("%{}%".format(search))
+        )
+
+        print(selection)
+        try:
+            if search:
+                current_questions = paginate_questions(request, selection)
+
+                return jsonify(
+                    {
+                        "success": True,
+                        "questions": current_questions,
+                        "total_questions": len(selection.all()),
+                        "currentCategory": []
+                    }
+                )
+
+        except:
+            abort(422)
 
     '''
   @TODO:
@@ -184,6 +208,25 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that
   category to be shown.
   '''
+    @app.route('/categories/<int:id>/questions', methods=['GET'])
+    def get_questions_sorted_by_category(id):
+        try:
+            category = Category.query.get(id)
+            selection = Question.query.filter_by(category=id).all()
+            current_questions = paginate_questions(request, selection)
+
+            if len(current_questions) == 0:
+                abort(404)
+
+            return jsonify({
+                'success': True,
+                'questions': current_questions,
+                'total_questions': len(selection),
+                'currentCategory': category.type
+            })
+
+        except Exception:
+            abort(422)
 
     '''
   @TODO:
