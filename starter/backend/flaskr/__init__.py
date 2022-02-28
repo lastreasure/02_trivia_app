@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, abort, jsonify
+from flask import Flask, current_app, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
@@ -54,7 +54,6 @@ def create_app(test_config=None):
         print(categories)
         formatted_categories = {
             category.id: category.type for category in categories}
-        # print(formatted_categories)
 
         if len(categories) == 0:
             abort(404)
@@ -80,11 +79,10 @@ def create_app(test_config=None):
     def get_questions():
 
         questions = Question.query.all()
-        # print(questions)
         formatted_questions = paginate_questions(request, questions)
 
         categories = Category.query.all()
-        # print(categories)
+
         formatted_categories = {
             category.id: category.type for category in categories}
 
@@ -95,6 +93,7 @@ def create_app(test_config=None):
             'total_questions': len(questions),
             'currentCategory': []
         })
+
     '''
   @TODO:
   Create an endpoint to DELETE question using a question ID.
@@ -160,6 +159,8 @@ def create_app(test_config=None):
                     'questions': current_questions,
                     'total_questions': len(Question.query.all())
                 })
+            else:
+                abort(422)
 
         except:
             abort(422)
@@ -239,11 +240,71 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not.
   '''
+    @app.route("/quizzes", methods=['POST'])
+    def get_quizzes():
+        body = request.get_json()
+        quiz_category = body.get('quiz_category')
+        previous_questions = body.get('previous_questions')
+
+        try:
+            # get the quiz questions distinct to each category
+            quiz_questions = None
+            if quiz_category['id'] == 0:
+                quiz_questions = Question.query.all()
+            else:
+                quiz_questions = Question.query.filter_by(
+                    category=quiz_category['id']).all()
+
+            # format the questions
+            format_questions = [question.format()
+                                for question in quiz_questions]
+
+            # create list of unanswered questions filtered by previous questions
+            unanswered_questions = []
+            for question in format_questions:
+                if question['id'] not in previous_questions:
+                    unanswered_questions.append(question)
+
+            # get current question from unanswered questions
+            current_question = None
+            if len(unanswered_questions) > 0:
+                current_question = random.choice(unanswered_questions)
+
+            return jsonify({
+                'success': True,
+                'question': current_question
+            })
+
+        except Exception:
+            abort(422)
 
     '''
   @TODO:
   Create error handlers for all expected errors
   including 404 and 422.
   '''
+
+    @ app.errorhandler(404)
+    def not_found(error):
+        return (
+            jsonify({"success": False, "error": 404,
+                    "message": "resource not found"}),
+            404,
+        )
+
+    @ app.errorhandler(422)
+    def unprocessable(error):
+        return (
+            jsonify({"success": False, "error": 422,
+                    "message": "unprocessable"}),
+            422,
+        )
+
+    @ app.errorhandler(400)
+    def bad_request(error):
+        return (jsonify({"success": False, "error": 400,
+                         "message": "bad request"}),
+                400,
+                )
 
     return app

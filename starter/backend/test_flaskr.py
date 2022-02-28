@@ -56,24 +56,21 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['categories'])
         self.assertTrue(data['total_questions'])
 
-    # def test_delete_question(self):
-    #     res = self.client().delete('/questions/6')
-    #     data = json.loads(res.data)
-    #     # print(data)
+    def test_delete_question(self):
+        res = self.client().delete('/questions/1')
+        data = json.loads(res.data)
+        print(data)
 
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertEqual(data['deleted'], 6)
-        # self.assertTrue(data['total_questions'])
-        # self.assertTrue(len(data['questions']))
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
 
-    # def test_422_if_question_does_not_exist(self):
-    #     res = self.client().delete("/questions/2000")
-    #     data = json.loads(res.data)
+    def test_422_if_question_does_not_exist(self):
+        res = self.client().delete("/questions/2000")
+        data = json.loads(res.data)
 
-    #     self.assertEqual(res.status_code, 422)
-    #     self.assertEqual(data["success"], False)
-    #     self.assertEqual(data["message"], "unprocessable")
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "unprocessable")
 
     def test_create_question(self):
         new_question = {
@@ -89,27 +86,27 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
 
-    # def test_422_if_create_question_not_allowed(self):
-    #     new_question = {
-        # 'question': 'Why is a raven like a writing desk?',
-    #         'answer': '42',
-    #         'category': '',
-    #         'difficulty': '3'
-    #     }
-    #     res = self.client().post('/questions', json=new_question)
-    #     data = json.loads(res.data)
+    def test_422_if_create_question_not_allowed(self):
+        new_question = {
+            'question': 'Why is a raven like a writing desk?',
+            'answer': '42',
+            'category': '',
+            'difficulty': '3'
+        }
+        res = self.client().post('/questions', json=new_question)
+        data = json.loads(res.data)
 
-    #     self.assertEqual(res.status_code, 422)
-    #     self.assertEqual(data['success'], False)
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
 
-    # def test_get_question_from_category(self):
-    #     res = self.client().get('/categories/2/questions')
-    #     data = json.loads(res.data)
+    def test_get_question_from_category(self):
+        res = self.client().get('/categories/2/questions')
+        data = json.loads(res.data)
 
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertNotEqual(len(data['questions']), 0)
-    #     self.assertEqual(data['current_category'], 'Art')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertNotEqual(len(data['questions']), 0)
+        self.assertEqual(data['currentCategory'], 'Art')
 
     def test_search_question_by_term(self):
         res = self.client().post('questions/search', json={"searchTerm": "bo"})
