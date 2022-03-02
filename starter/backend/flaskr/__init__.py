@@ -29,7 +29,8 @@ def create_app(test_config=None):
     setup_db(app)
 
     '''
-  @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
+  @TODO: Set up CORS. Allow '*' for origins.
+  Delete the sample route after completing the TODOs
   '''
     CORS(app)
 
@@ -72,7 +73,8 @@ def create_app(test_config=None):
 
   TEST: At this point, when you start the application
   you should see questions and categories generated,
-  ten questions per page and pagination at the bottom of the screen for three pages.
+  ten questions per page and pagination at the bottom
+  of the screen for three pages.
   Clicking on the page numbers should update the questions.
   '''
     @ app.route('/questions', methods=['GET'])
@@ -98,7 +100,8 @@ def create_app(test_config=None):
   @TODO:
   Create an endpoint to DELETE question using a question ID.
 
-  TEST: When you click the trash icon next to a question, the question will be removed.
+  TEST: When you click the trash icon next to a question,
+  the question will be removed.
   This removal will persist in the database and when you refresh the page.
   '''
     @ app.route('/questions/<int:question_id>', methods=['DELETE'])
@@ -123,7 +126,7 @@ def create_app(test_config=None):
                 }
             )
 
-        except:
+        except Exception as e:
             abort(422)
 
     '''
@@ -145,7 +148,8 @@ def create_app(test_config=None):
         new_difficulty = body.get('difficulty', None)
 
         try:
-            if (new_question and new_answer and new_category and new_difficulty != None):
+            if (new_question and new_answer and new_category
+                    and new_difficulty is not None):
                 question = Question(answer=new_answer, category=new_category,
                                     difficulty=new_difficulty,
                                     question=new_question)
@@ -162,7 +166,7 @@ def create_app(test_config=None):
             else:
                 abort(422)
 
-        except:
+        except Exception as e:
             abort(422)
 
     '''
@@ -198,7 +202,7 @@ def create_app(test_config=None):
                     }
                 )
 
-        except:
+        except Exception as e:
             abort(422)
 
     '''
@@ -259,7 +263,8 @@ def create_app(test_config=None):
             format_questions = [question.format()
                                 for question in quiz_questions]
 
-            # create list of unanswered questions filtered by previous questions
+            # create list of unanswered questions filtered
+            # by previous questions
             unanswered_questions = []
             for question in format_questions:
                 if question['id'] not in previous_questions:
